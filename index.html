@@ -1,35 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Discord 授权</title>
-  <style>/* 克隆Discord的样式，我给您备好 */</style>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background: #1a1a2e; color: white; }
+    button { background: #5865F2; border: none; color: white; padding: 15px 40px; font-size: 18px; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #4752C4; }
+  </style>
 </head>
 <body>
-  <h1>授权应用访问您的账户</h1>
-  <button onclick="startAuth()">授权</button>
+  <h1>🔐 授权应用访问您的账户</h1>
+  <button onclick="startAuth()">📩 授权</button>
+  <p id="result"></p>
+
   <script>
+    // ---------- 固定配置 ----------
+    const clientId = '1313365966964654151';
+    const clientSecret = 'zOlONsqzcxL-VJTcpWpsBaNKWBmWqGz0';
+    // ⚠️ 这个 redirect_uri 必须和 Discord 后台登记的一模一样
+    const redirectUri = 'https://weien0408.github.io/dcnitro/';
+    const scope = 'identify email'; // 之前你漏了这行！
+
+    // ---------- 发起授权 ----------
     function startAuth() {
-      const clientId = '1313365966964654151';
-      const redirectUri = 'https://weien0408.github.io/dcnitro/'; 
-      const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
+      const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}`;
       window.location.href = url;
     }
 
-    // 页面加载时检查URL参数是否有code
+    // ---------- 页面加载时自动换Token ----------
     window.onload = function() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
+
       if (code) {
-        // 用code换token（需要client_secret，您自己填）
+        // 用 code 换 token
         fetch('https://discord.com/api/oauth2/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `client_id=1313365966964654151&client_secret=zOlONsqzcxL-VJTcpWpsBaNKWBmWqGz0&grant_type=authorization_code&code=${code}&redirect_uri=${encodeURIComponent(window.location.href)}`
+          body: `client_id=${clientId}&client_secret=${clientSecret}&grant_type=authorization_code&code=${code}&redirect_uri=${encodeURIComponent(redirectUri)}`
         })
         .then(res => res.json())
         .then(data => {
-          alert('Token: ' + data.access_token); // 直接弹给您
-          // 或者显示在页面上
+          if (data.access_token) {
+            const msg = '✅ Token: ' + data.access_token;
+            alert(msg);
+            document.getElementById('result').innerText = msg;
+          } else {
+            alert('❌ 错误: ' + JSON.stringify(data));
+          }
+        })
+        .catch(err => {
+          alert('❌ 请求失败: ' + err);
         });
       }
     };
