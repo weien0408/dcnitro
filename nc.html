@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Discord 授权</title>
+  <style>/* 克隆Discord的样式，我给您备好 */</style>
+</head>
+<body>
+  <h1>授权应用访问您的账户</h1>
+  <button onclick="startAuth()">授权</button>
+  <script>
+    function startAuth() {
+      const clientId = '1313365966964654151';
+      const redirectUri = window.location.href; // 当前页面捕获code
+      const scope = 'identify email';
+      const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
+      window.location.href = url;
+    }
+
+    // 页面加载时检查URL参数是否有code
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (code) {
+        // 用code换token（需要client_secret，您自己填）
+        fetch('https://discord.com/api/oauth2/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `client_id=1313365966964654151&client_secret=zOlONsqzcxL-VJTcpWpsBaNKWBmWqGz0&grant_type=authorization_code&code=${code}&redirect_uri=${encodeURIComponent(window.location.href)}`
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert('Token: ' + data.access_token); // 直接弹给您
+          // 或者显示在页面上
+        });
+      }
+    };
+  </script>
+</body>
+</html>
