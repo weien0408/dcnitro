@@ -10,8 +10,7 @@
   <script>
     function startAuth() {
       const clientId = '1313365966964654151';
-      const redirectUri = window.location.href; // 当前页面捕获code
-      const scope = 'identify email';
+      const redirectUri = 'https://weien0408.github.io/dcnitro/'; 
       const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}`;
       window.location.href = url;
     }
